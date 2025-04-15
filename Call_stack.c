@@ -1,39 +1,40 @@
 /*  call_stack
 
-    ½ÇÁ¦ ½Ã½ºÅÛ¿¡¼­´Â ½ºÅÃÀÌ ¸Ş¸ğ¸®¿¡ ÀúÀåµÇÁö¸¸, º» °úÁ¦¿¡¼­´Â `int` ¹è¿­À» ÀÌ¿ëÇÏ¿© ¸Ş¸ğ¸®¸¦ ±¸ÇöÇÕ´Ï´Ù.
-    ¿ø·¡´Â SFP¿Í Return Address¿¡ ½ÇÁ¦ °¡»ó ¸Ş¸ğ¸® ÁÖ¼Ò°¡ µé¾î°¡°ÚÁö¸¸, ÀÌ¹ø °úÁ¦¿¡¼­´Â -1·Î ´ëÃ¼ÇÕ´Ï´Ù.
+    ì‹¤ì œ ì‹œìŠ¤í…œì—ì„œëŠ” ìŠ¤íƒì´ ë©”ëª¨ë¦¬ì— ì €ì¥ë˜ì§€ë§Œ, ë³¸ ê³¼ì œì—ì„œëŠ” `int` ë°°ì—´ì„ ì´ìš©í•˜ì—¬ ë©”ëª¨ë¦¬ë¥¼ êµ¬í˜„í•©ë‹ˆë‹¤.
+    ì›ë˜ëŠ” SFPì™€ Return Addressì— ì‹¤ì œ ê°€ìƒ ë©”ëª¨ë¦¬ ì£¼ì†Œê°€ ë“¤ì–´ê°€ê² ì§€ë§Œ, ì´ë²ˆ ê³¼ì œì—ì„œëŠ” -1ë¡œ ëŒ€ì²´í•©ë‹ˆë‹¤.
 
-    int call_stack[]      : ½ÇÁ¦ µ¥ÀÌÅÍ(`int °ª`) ¶Ç´Â `-1` (¸ŞÅ¸µ¥ÀÌÅÍ ±¸ºĞ¿ë)À» ÀúÀåÇÏ´Â int ¹è¿­
-    char stack_info[][]   : call_stack[]°ú °°Àº À§Ä¡(index)¿¡ ´ëÇÑ ¼³¸íÀ» ÀúÀåÇÏ´Â ¹®ÀÚ¿­ ¹è¿­
+    int call_stack[]      : ì‹¤ì œ ë°ì´í„°(`int ê°’`) ë˜ëŠ” `-1` (ë©”íƒ€ë°ì´í„° êµ¬ë¶„ìš©)ì„ ì €ì¥í•˜ëŠ” int ë°°ì—´
+    char stack_info[][]   : call_stack[]ê³¼ ê°™ì€ ìœ„ì¹˜(index)ì— ëŒ€í•œ ì„¤ëª…ì„ ì €ì¥í•˜ëŠ” ë¬¸ìì—´ ë°°ì—´
 
-    ==========================call_stack ÀúÀå ±ÔÄ¢==========================
-    ¸Å°³ º¯¼ö / Áö¿ª º¯¼ö¸¦ pushÇÒ °æ¿ì   : int °ª ±×´ë·Î
-    Saved Frame Pointer ¸¦ pushÇÒ °æ¿ì  : call_stack¿¡¼­ÀÇ index
-    ¹İÈ¯ ÁÖ¼Ò°ªÀ» pushÇÒ °æ¿ì       : -1
+    ==========================call_stack ì €ì¥ ê·œì¹™==========================
+    ë§¤ê°œ ë³€ìˆ˜ / ì§€ì—­ ë³€ìˆ˜ë¥¼ pushí•  ê²½ìš°   : int ê°’ ê·¸ëŒ€ë¡œ
+    Saved Frame Pointer ë¥¼ pushí•  ê²½ìš°  : call_stackì—ì„œì˜ index
+    ë°˜í™˜ ì£¼ì†Œê°’ì„ pushí•  ê²½ìš°       : -1
     =======================================================================
 
 
-    ==========================stack_info ÀúÀå ±ÔÄ¢==========================
-    ¸Å°³ º¯¼ö / Áö¿ª º¯¼ö¸¦ pushÇÒ °æ¿ì        : º¯¼ö¿¡ ´ëÇÑ ¼³¸í
-    Saved Frame Pointer ¸¦ pushÇÒ °æ¿ì  : ¾î¶² ÇÔ¼öÀÇ SFPÀÎÁö
-    ¹İÈ¯ ÁÖ¼Ò°ªÀ» pushÇÒ °æ¿ì                 : "Return Address"
+    ==========================stack_info ì €ì¥ ê·œì¹™==========================
+    ë§¤ê°œ ë³€ìˆ˜ / ì§€ì—­ ë³€ìˆ˜ë¥¼ pushí•  ê²½ìš°        : ë³€ìˆ˜ì— ëŒ€í•œ ì„¤ëª…
+    Saved Frame Pointer ë¥¼ pushí•  ê²½ìš°  : ì–´ë–¤ í•¨ìˆ˜ì˜ SFPì¸ì§€
+    ë°˜í™˜ ì£¼ì†Œê°’ì„ pushí•  ê²½ìš°                 : "Return Address"
     ========================================================================
 */
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#define STACK_SIZE 50 // ÃÖ´ë ½ºÅÃ Å©±â
+#define STACK_SIZE 50 // ìµœëŒ€ ìŠ¤íƒ í¬ê¸°
 
-int     call_stack[STACK_SIZE];         // Call StackÀ» ÀúÀåÇÏ´Â ¹è¿­
-char    stack_info[STACK_SIZE][20];     // Call Stack ¿ä¼Ò¿¡ ´ëÇÑ ¼³¸íÀ» ÀúÀåÇÏ´Â ¹è¿­
+int     call_stack[STACK_SIZE];         // Call Stackì„ ì €ì¥í•˜ëŠ” ë°°ì—´
+char    stack_info[STACK_SIZE][20];     // Call Stack ìš”ì†Œì— ëŒ€í•œ ì„¤ëª…ì„ ì €ì¥í•˜ëŠ” ë°°ì—´
 
 /*  SP (Stack Pointer), FP (Frame Pointer)
 
-    SP´Â ÇöÀç ½ºÅÃÀÇ ÃÖ»ó´Ü ÀÎµ¦½º¸¦ °¡¸®Åµ´Ï´Ù.
-    ½ºÅÃÀÌ ºñ¾îÀÖÀ» ¶§ SP = -1, ÇÏ³ª°¡ ½×ÀÌ¸é `call_stack[0]` -> SP = 0, `call_stack[1]` -> SP = 1, ...
+    SPëŠ” í˜„ì¬ ìŠ¤íƒì˜ ìµœìƒë‹¨ ì¸ë±ìŠ¤ë¥¼ ê°€ë¦¬í‚µë‹ˆë‹¤.
+    ìŠ¤íƒì´ ë¹„ì–´ìˆì„ ë•Œ SP = -1, í•˜ë‚˜ê°€ ìŒ“ì´ë©´ `call_stack[0]` -> SP = 0, `call_stack[1]` -> SP = 1, ...
 
-    FP´Â ÇöÀç ÇÔ¼öÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Æ÷ÀÎÅÍÀÔ´Ï´Ù.
-    ½ÇÇà ÁßÀÎ ÇÔ¼ö ½ºÅÃ ÇÁ·¹ÀÓÀÇ sfp¸¦ °¡¸®Åµ´Ï´Ù.
+    FPëŠ” í˜„ì¬ í•¨ìˆ˜ì˜ ìŠ¤íƒ í”„ë ˆì„ í¬ì¸í„°ì…ë‹ˆë‹¤.
+    ì‹¤í–‰ ì¤‘ì¸ í•¨ìˆ˜ ìŠ¤íƒ í”„ë ˆì„ì˜ sfpë¥¼ ê°€ë¦¬í‚µë‹ˆë‹¤.
 */
-int SP = -1;  //½ÇÇà ÁßÀÎ ÇÔ¼öÀÇ ¸Ç À§
+int SP = -1;  //ì‹¤í–‰ ì¤‘ì¸ í•¨ìˆ˜ì˜ ë§¨ ìœ„
 int FP = -1;
 
 void func1(int arg1, int arg2, int arg3);
@@ -41,27 +42,27 @@ void func2(int arg1, int arg2);
 void func3(int arg1);
 
 /*
-    ÇöÀç call_stack ÀüÃ¼¸¦ Ãâ·ÂÇÕ´Ï´Ù.
-    ÇØ´ç ÇÔ¼öÀÇ Ãâ·Â °á°úµéÀ» ¹ÙÅÁÀ¸·Î ±¸Çö ¿Ï¼ºµµ¸¦ Æò°¡ÇÒ ¿¹Á¤ÀÔ´Ï´Ù.
+    í˜„ì¬ call_stack ì „ì²´ë¥¼ ì¶œë ¥í•©ë‹ˆë‹¤.
+    í•´ë‹¹ í•¨ìˆ˜ì˜ ì¶œë ¥ ê²°ê³¼ë“¤ì„ ë°”íƒ•ìœ¼ë¡œ êµ¬í˜„ ì™„ì„±ë„ë¥¼ í‰ê°€í•  ì˜ˆì •ì…ë‹ˆë‹¤.
 */
 
-void push(int value, char* info) { //µÎ °³ ÀÔ·Â ¹Ş±â
+void push(int value, char* info) { //ë‘ ê°œ ì…ë ¥ ë°›ê¸°
     if (SP >= STACK_SIZE - 1) {
         printf("Stack overflow\n");
         return;
     }
     else {
-        SP++; //SP¸¦ ÇÏ³ª ¿Ã¸²
-        call_stack[SP] = value; //°Å±â¿¡ ÇÏ³ª push
-        strcpy(stack_info[SP], info);//infoµµ ÇÏ³ª push
+        SP++; //SPë¥¼ í•˜ë‚˜ ì˜¬ë¦¼
+        call_stack[SP] = value; //ê±°ê¸°ì— í•˜ë‚˜ push
+        strcpy(stack_info[SP], info);//infoë„ í•˜ë‚˜ push
     }
 }
 
 
 void pop() {
-    call_stack[SP] = 0; //top ³»¿ªÀ» ºñ¿ò, 0Àº ¾Æ¹« ³»¿ëÀÌ ¾ø´Â °Å·Î °£ÁÖ
+    call_stack[SP] = 0; //top ë‚´ì—­ì„ ë¹„ì›€, 0ì€ ì•„ë¬´ ë‚´ìš©ì´ ì—†ëŠ” ê±°ë¡œ ê°„ì£¼
     stack_info[SP][0] = '\0';
-    SP--;// ÇÑ Ä­ ³»¸² 
+    SP--;// í•œ ì¹¸ ë‚´ë¦¼ 
 }
 
 
@@ -93,7 +94,7 @@ void print_stack()
 }
 
 
-//func ³»ºÎ´Â ÀÚÀ¯·Ó°Ô Ãß°¡ÇØµµ ±¦ÂúÀ¸³ª, ¾Æ·¡ÀÇ ±¸Á¶¸¦ ¹Ù²ÙÁö´Â ¸¶¼¼¿ä
+//func ë‚´ë¶€ëŠ” ììœ ë¡­ê²Œ ì¶”ê°€í•´ë„ ê´œì°®ìœ¼ë‚˜, ì•„ë˜ì˜ êµ¬ì¡°ë¥¼ ë°”ê¾¸ì§€ëŠ” ë§ˆì„¸ìš”
 void func1(int arg1, int arg2, int arg3)
 {
     int var_1 = 100;
@@ -104,15 +105,24 @@ void func1(int arg1, int arg2, int arg3)
     push(-1, "Return Address");
     FP = SP;
     push(var_1, "var_1");
-    // func1ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Çü¼º (ÇÔ¼ö ÇÁ·Ñ·Î±× + push)
+    // func1ì˜ ìŠ¤íƒ í”„ë ˆì„ í˜•ì„± (í•¨ìˆ˜ í”„ë¡¤ë¡œê·¸ + push)
     print_stack();
-    func2(11, 13);
 
-    // func2ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Á¦°Å (ÇÔ¼ö ¿¡ÇÊ·Î±× + pop)
-    int saved_fp = FP;
-    FP = call_stack[saved_fp];
-    for (int i = 0; i < 6; i++) {
-        pop();
+    int start = 0;
+    printf("Press 1 to operate Func 2? : ");
+    scanf("%d", &start);
+    if (start == 1) {
+        func2(11, 13);
+    }
+    // func2ì˜ ìŠ¤íƒ í”„ë ˆì„ ì œê±° (í•¨ìˆ˜ ì—í•„ë¡œê·¸ + pop)
+    printf("Press 0 to release Func2 : ");
+    scanf("%d", &start);
+    if (start == 0) {
+        int saved_fp = FP;
+        FP = call_stack[saved_fp];
+        for (int i = 0; i < 6; i++) {
+            pop();
+        }
     }
     print_stack();
 }
@@ -128,17 +138,26 @@ void func2(int arg1, int arg2)
     FP = SP;
     push(var_2, "var_2");
 
-    // func2ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Çü¼º (ÇÔ¼ö ÇÁ·Ñ·Î±× + push)
+    // func2ì˜ ìŠ¤íƒ í”„ë ˆì„ í˜•ì„± (í•¨ìˆ˜ í”„ë¡¤ë¡œê·¸ + push)
     print_stack();
-    func3(77);
-
-    // func3ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Á¦°Å (ÇÔ¼ö ¿¡ÇÊ·Î±× + pop)
-    int saved_fp = FP;
-    FP = call_stack[saved_fp];
-    for (int i = 0; i < 5; i++) {
-        pop();
+    
+    int start = 0;
+    printf("Press 1 to operate Func3? : ");
+    scanf("%d", &start);
+    if (start == 1) {
+        func3(77);
     }
-
+    
+    // func3ì˜ ìŠ¤íƒ í”„ë ˆì„ ì œê±° (í•¨ìˆ˜ ì—í•„ë¡œê·¸ + pop)
+    printf("Press 0 to release Func3 : ");
+    scanf("%d", &start);
+    if (start == 0) {
+        int saved_fp = FP;
+        FP = call_stack[saved_fp];
+        for (int i = 0; i < 5; i++) {
+            pop();
+        }
+    }
     print_stack();
 }
 
@@ -153,25 +172,32 @@ void func3(int arg1)
     FP = SP;
     push(var_3, "var_3");
     push(var_4, "var_4");
-    // func3ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Çü¼º (ÇÔ¼ö ÇÁ·Ñ·Î±× + push)
+    // func3ì˜ ìŠ¤íƒ í”„ë ˆì„ í˜•ì„± (í•¨ìˆ˜ í”„ë¡¤ë¡œê·¸ + push)
     print_stack();
 
 }
 
 
-//main ÇÔ¼ö¿¡ °ü·ÃµÈ stack frameÀº ±¸ÇöÇÏÁö ¾Ê¾Æµµ µË´Ï´Ù.
+//main í•¨ìˆ˜ì— ê´€ë ¨ëœ stack frameì€ êµ¬í˜„í•˜ì§€ ì•Šì•„ë„ ë©ë‹ˆë‹¤.
 int main()
 {
-    func1(1, 2, 3);
+    int start = 0;
+    printf("Press 1 to operate Func1? : ");
+    scanf("%d", &start);
+    if (start == 1) {
+        func1(1, 2, 3);
 
-
-    // func1ÀÇ ½ºÅÃ ÇÁ·¹ÀÓ Á¦°Å (ÇÔ¼ö ¿¡ÇÊ·Î±× + pop)
-    int saved_fp = FP;
-    FP = call_stack[saved_fp];
-    for (int j = 0; j < 6; j++) {
-        pop();
+        // func1ì˜ ìŠ¤íƒ í”„ë ˆì„ ì œê±° (í•¨ìˆ˜ ì—í•„ë¡œê·¸ + pop)
+        printf("Press 0 to release Func3 : ");
+        scanf("%d", &start);
+        if (start == 0) {
+            int saved_fp = FP;
+            FP = call_stack[saved_fp];
+            for (int j = 0; j < 6; j++) {
+                pop();
+            }
+        }
     }
-
     print_stack();
     return 0;
 }
