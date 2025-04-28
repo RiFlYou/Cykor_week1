@@ -109,10 +109,17 @@ void func1(int arg1, int arg2, int arg3)
     print_stack();
 
     int start = 0;
-    printf("Press 1 to operate Func 2? : ");
+    printf("Press 2 to operate Func 2? : ");
     scanf("%d", &start);
-    if (start == 1) {
-        func2(11, 13);
+    if (start == 2) {
+        printf("Enter two index : ");
+        int index21, index22;
+        if (scanf("%d %d", &index21, &index22) != 2) {  // func2 호출 전에 입력값 검사
+            printf("Input Error : You must enter two index");
+            return;
+        }
+        while (getchar() != '\n');  //남은 입력값 청소
+        func2(index21, index22);
     }
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
     printf("Press 0 to release Func2 : ");
@@ -140,14 +147,21 @@ void func2(int arg1, int arg2)
 
     // func2의 스택 프레임 형성 (함수 프롤로그 + push)
     print_stack();
-    
+
     int start = 0;
-    printf("Press 1 to operate Func3? : ");
+    printf("Press 3 to operate Func 3? : ");
     scanf("%d", &start);
-    if (start == 1) {
-        func3(77);
+    if (start == 3) {
+        printf("Enter a index : ");
+        int index31;
+        if (scanf("%d", &index31) != 1) {    //func3 호출 전에 입력갑 검사
+            printf("Input Error : You must enter one index");
+            return;
+        }
+        while (getchar() != '\n'); //남은 입력값 청소
+        func3(index31);
     }
-    
+
     // func3의 스택 프레임 제거 (함수 에필로그 + pop)
     printf("Press 0 to release Func3 : ");
     scanf("%d", &start);
@@ -177,15 +191,20 @@ void func3(int arg1)
 
 }
 
-
-//main 함수에 관련된 stack frame은 구현하지 않아도 됩니다.
 int main()
 {
     int start = 0;
-    printf("Press 1 to operate Func1? : ");
+    printf("Press 1 to operate Func 1 : "); 
     scanf("%d", &start);
     if (start == 1) {
-        func1(1, 2, 3);
+        printf("Enter three index : ");
+        int index11, index12, index13;
+        if (scanf("%d %d %d", &index11, &index12, &index13) != 3) {  //func1 호출 전에 입력값 검사
+            printf("Input Error : You must enter three index");
+            return;
+        }
+        while (getchar() != '\n'); //남은 입력값 청소
+        func1(index11, index12, index13);
 
         // func1의 스택 프레임 제거 (함수 에필로그 + pop)
         printf("Press 0 to release Func3 : ");
@@ -197,7 +216,8 @@ int main()
                 pop();
             }
         }
-    }
+    }  
+
     print_stack();
     return 0;
 }
