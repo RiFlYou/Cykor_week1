@@ -1,0 +1,202 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#define STACK_SIZE 50 
+
+int     call_stack[STACK_SIZE];         
+char    stack_info[STACK_SIZE][20];     
+
+int SP = -1;  
+int FP = -1;
+
+void func1(int arg1, int arg2, int arg3);
+void func2(int arg1, int arg2);
+void func3(int arg1);
+
+int input_clear_check() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {
+        if (c != ' ') { 
+            return 0; 
+        }
+    }
+    return 1; 
+}
+
+
+void push(int value, char* info) { 
+    if (SP >= STACK_SIZE - 1) {
+        printf("Stack overflow\n");
+        return;
+    }
+    else {
+        SP++; 
+        call_stack[SP] = value; 
+        strcpy(stack_info[SP], info);
+    }
+}
+
+
+void pop() {
+    call_stack[SP] = 0; 
+    stack_info[SP][0] = '\0';
+    SP--;
+}
+
+
+void print_stack()
+{
+    if (SP == -1)
+    {
+        printf("Stack is empty.\n");
+        return;
+    }
+
+    printf("====== Current Call Stack ======\n");
+
+    for (int i = SP; i >= 0; i--)
+    {
+        if (call_stack[i] != -1)
+            printf("%d : %s = %d", i, stack_info[i], call_stack[i]);
+        else
+            printf("%d : %s", i, stack_info[i]);
+
+        if (i == SP)
+            printf("    <=== [esp]\n");
+        else if (i == FP)
+            printf("    <=== [ebp]\n");
+        else
+            printf("\n");
+    }
+    printf("================================\n\n");
+}
+
+void func1(int arg1, int arg2, int arg3)
+{
+    int var_1 = 100;
+    push(arg1, "arg1");
+    push(arg2, "arg2");
+    push(arg3, "arg3");
+    push(FP, "func1 SFP");
+    push(-1, "Return Address");
+    FP = SP;
+    push(var_1, "var_1");
+
+    print_stack();
+
+    int start = 0;
+    printf("Press 2 to operate Func 2? : ");
+    scanf("%d", &start);
+
+    if (start == 2) {
+        int index21, index22;
+        while(1){
+            printf("Enter two index : ");
+            if (scanf("%d %d", &index21, &index22) == 2 && (input_clear_check())) { 
+                break;
+            }
+            printf("Input Error : You must enter two index\n");
+            while (getchar() != '\n'); 
+        }    
+        func2(index21, index22);
+    }
+    printf("Press 0 to release Func2 : ");
+    scanf("%d", &start);
+    if (start == 0) {
+        int saved_fp = FP;
+        FP = call_stack[saved_fp];
+        for (int i = 0; i < 6; i++) {
+            pop();
+        }
+    }
+    print_stack();
+}
+
+void func2(int arg1, int arg2)
+{
+    int var_2 = 200;
+    push(arg1, "arg1");
+    push(arg2, "arg2");
+    push(FP, "func2 SFP");
+    push(-1, "Return Address");
+    FP = SP;
+    push(var_2, "var_2");
+
+    print_stack();
+
+    int start = 0;
+    printf("Press 3 to operate Func 3? : ");
+    scanf("%d", &start);
+    if (start == 3) {
+        int index31;
+        while(1){   
+            printf("Enter a index : ");
+            if (scanf("%d", &index31)  == 1 && (input_clear_check())) {   
+                break;
+            }
+            printf("Input Error : You must enter one index\n");
+            while (getchar() != '\n');
+        }
+        func3(index31);
+    }
+
+    printf("Press 0 to release Func3 : ");
+    scanf("%d", &start);
+    if (start == 0) {
+        int saved_fp = FP;
+        FP = call_stack[saved_fp];
+        for (int i = 0; i < 5; i++) {
+            pop();
+        }
+    }
+    print_stack();
+}
+
+
+void func3(int arg1)
+{
+    int var_3 = 300;
+    int var_4 = 400;
+    push(arg1, "arg1");
+    push(-1, "Return Address");
+    push(FP, "func3 SFP");
+    FP = SP;
+    push(var_3, "var_3");
+    push(var_4, "var_4");
+
+    print_stack();
+
+}
+
+int main()
+{
+    int start = 0;
+    printf("Press 1 to operate Func 1 : ");
+    scanf("%d", &start);
+    if (start == 1) {
+        int index11, index12, index13;
+       
+        while(1){
+            printf("Enter three index : ");
+            if (scanf("%d %d %d", &index11, &index12, &index13) == 3 && (input_clear_check())) {  
+                break;
+            }
+            printf("Input Error : You must enter three index\n");
+            while (getchar() != '\n'); 
+        } 
+
+        func1(index11, index12, index13);
+   
+        printf("Press 0 to release Func3 : ");
+        scanf("%d", &start);
+        if (start == 0) {
+            int saved_fp = FP;
+            FP = call_stack[saved_fp];
+            for (int j = 0; j < 6; j++) {
+                pop();
+            }
+        }
+    }
+
+    print_stack();
+    return 0;
+}
