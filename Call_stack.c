@@ -46,7 +46,19 @@ void func3(int arg1);
     해당 함수의 출력 결과들을 바탕으로 구현 완성도를 평가할 예정입니다.
 */
 
-void push(int value, char* info) { //두 개 입력 받기
+
+int input_clear_check() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {
+        if (c != ' ') { // 정해진 길이까지 왔는데, 공백이 아닌 다른 문자가 발견됐다 
+            return 0; 
+        }
+    }
+    return 1; // 정상적으로 줄 끝까지 도달
+}
+
+
+void push(int value, char* info) { //값, 설명 입력 받기
     if (SP >= STACK_SIZE - 1) {
         printf("Stack overflow\n");
         return;
@@ -105,20 +117,24 @@ void func1(int arg1, int arg2, int arg3)
     push(-1, "Return Address");
     FP = SP;
     push(var_1, "var_1");
+
     // func1의 스택 프레임 형성 (함수 프롤로그 + push)
     print_stack();
 
     int start = 0;
     printf("Press 2 to operate Func 2? : ");
     scanf("%d", &start);
+
     if (start == 2) {
-        printf("Enter two index : ");
         int index21, index22;
-        if (scanf("%d %d", &index21, &index22) != 2) {  // func2 호출 전에 입력값 검사
-            printf("Input Error : You must enter two index");
-            return;
-        }
-        while (getchar() != '\n');  //남은 입력값 청소
+        while(1){
+            printf("Enter two index : ");
+            if (scanf("%d %d", &index21, &index22) == 2 && (input_clear_check())) {  // func2 호출 전에 입력값 검사
+                break;
+            }
+            printf("Input Error : You must enter two index\n");
+            while (getchar() != '\n'); // 남은 입력값 청소
+        }    
         func2(index21, index22);
     }
     // func2의 스택 프레임 제거 (함수 에필로그 + pop)
@@ -152,13 +168,15 @@ void func2(int arg1, int arg2)
     printf("Press 3 to operate Func 3? : ");
     scanf("%d", &start);
     if (start == 3) {
-        printf("Enter a index : ");
         int index31;
-        if (scanf("%d", &index31) != 1) {    //func3 호출 전에 입력갑 검사
-            printf("Input Error : You must enter one index");
-            return;
+        while(1){   
+            printf("Enter a index : ");
+            if (scanf("%d", &index31) == 1 && (input_clear_check())) {    //func3 호출 전에 입력갑 검사
+                break;
+            }
+            printf("Input Error : You must enter one index\n");
+            while (getchar() != '\n');
         }
-        while (getchar() != '\n'); //남은 입력값 청소
         func3(index31);
     }
 
@@ -186,6 +204,7 @@ void func3(int arg1)
     FP = SP;
     push(var_3, "var_3");
     push(var_4, "var_4");
+
     // func3의 스택 프레임 형성 (함수 프롤로그 + push)
     print_stack();
 
@@ -194,16 +213,20 @@ void func3(int arg1)
 int main()
 {
     int start = 0;
-    printf("Press 1 to operate Func 1 : "); 
+    printf("Press 1 to operate Func 1 : ");
     scanf("%d", &start);
     if (start == 1) {
-        printf("Enter three index : ");
         int index11, index12, index13;
-        if (scanf("%d %d %d", &index11, &index12, &index13) != 3) {  //func1 호출 전에 입력값 검사
-            printf("Input Error : You must enter three index");
-            return;
-        }
-        while (getchar() != '\n'); //남은 입력값 청소
+       
+        while(1){
+            printf("Enter three index : ");
+            if (scanf("%d %d %d", &index11, &index12, &index13) == 3 && (input_clear_check())) {  //func1 호출 전에 입력값 검사
+                break;
+            }
+            printf("Input Error : You must enter three index\n");
+            while (getchar() != '\n'); //남은 입력값 청소
+        } 
+
         func1(index11, index12, index13);
 
         // func1의 스택 프레임 제거 (함수 에필로그 + pop)
@@ -216,7 +239,7 @@ int main()
                 pop();
             }
         }
-    }  
+    }
 
     print_stack();
     return 0;
